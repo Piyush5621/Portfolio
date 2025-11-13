@@ -2,74 +2,72 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Blogs</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blogs</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabaseClient.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
 </head>
 
 <body class="bg-black text-white">
 
 <header class="fixed w-full top-0 left-0 bg-black shadow-md z-50">
-    <div id="site-header"></div>
+  <div id="site-header"></div>
 </header>
 
 <script>
 async function loadHeader() {
-    const el = document.getElementById("site-header");
-    const html = await fetch("header.html").then(r => r.text());
-    el.innerHTML = html;
+  const el = document.getElementById("site-header");
+  const html = await fetch("header.html").then(r => r.text());
+  el.innerHTML = html;
 }
 loadHeader();
 </script>
 
 <section class="pt-[6rem] max-w-6xl mx-auto px-6 pb-20">
+  <h1 class="text-4xl font-bold mb-10 text-center">Blogs</h1>
 
-    <h1 class="text-4xl font-bold mb-10 text-center">Blogs</h1>
-
-    <div id="blogList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        <p class="text-gray-400">Loading blogs...</p>
-    </div>
-
+  <div id="blogList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+    <p class="text-gray-400">Loading blogs...</p>
+  </div>
 </section>
 
 <script>
 async function loadBlogs() {
-    const { data, error } = await supabase
-        .from("blogs")
-        .select("*")
-        .order("id", { ascending: false });
+  const { data, error } = await supabase
+      .from("blogs")
+      .select("*")
+      .order("id", { ascending: false });
 
-    const container = document.getElementById("blogList");
-    container.innerHTML = "";
+  const container = document.getElementById("blogList");
+  container.innerHTML = "";
 
-    if (error) {
-        container.innerHTML = `<p class="text-red-500">Failed to load blogs.</p>`;
-        return;
-    }
+  if (error) {
+    container.innerHTML = `<p class="text-red-500">Failed to load blogs.</p>`;
+    return;
+  }
 
-    data.forEach(blog => {
-        container.innerHTML += `
-            <div class="bg-[#111] rounded-xl p-4 border border-gray-800 hover:scale-105 transition">
-                <img src="${blog.image_url}" class="rounded-xl h-48 w-full object-cover">
+  data.forEach(blog => {
+    container.innerHTML += `
+      <div class="bg-[#111] rounded-xl p-4 border border-gray-800 hover:scale-105 transition">
+        <img src="${blog.image_url}" class="rounded-xl h-48 w-full object-cover">
 
-                <h2 class="text-xl font-bold mt-4">${blog.title}</h2>
-                <p class="text-purple-400 text-sm mb-3">${blog.category}</p>
+        <h2 class="text-xl font-bold mt-4">${blog.title}</h2>
+        <p class="text-purple-400 text-sm mb-3">${blog.category}</p>
 
-                <p class="text-gray-400 text-sm line-clamp-3">
-                    ${blog.content.substring(0, 120)}...
-                </p>
+        <p class="text-gray-400 text-sm line-clamp-3">
+          ${blog.content.substring(0, 120)}...
+        </p>
 
-                <a href="blog.html?id=${blog.id}"
-                   class="inline-block mt-4 bg-purple-600 px-4 py-2 rounded hover:bg-purple-700 transition">
-                    Read More
-                </a>
-            </div>
-        `;
-    });
+        <a href="blog.html?id=${blog.id}"
+           class="inline-block mt-4 bg-purple-600 px-4 py-2 rounded hover:bg-purple-700 transition">
+          Read More
+        </a>
+      </div>
+    `;
+  });
 }
 
 loadBlogs();
