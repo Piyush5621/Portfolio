@@ -16,21 +16,14 @@
     <script src="js/supabaseClient.js"></script>
 
     <style>
-        /* Hover shadow colors */
-        .hover-shadow-blue:hover { box-shadow: 0 0 25px rgba(59,130,246,0.6); }
-        .hover-shadow-red:hover { box-shadow: 0 0 25px rgba(239,68,68,0.6); }
-        .hover-shadow-green:hover { box-shadow: 0 0 25px rgba(34,197,94,0.6); }
-        .hover-shadow-yellow:hover { box-shadow: 0 0 25px rgba(234,179,8,0.6); }
-        .hover-shadow-purple:hover { box-shadow: 0 0 25px rgba(168,85,247,0.6); }
-
         /* Skeleton shimmer */
         .skeleton {
             animation: shimmer 1.5s infinite linear;
             background: linear-gradient(
                 90deg,
-                rgba(255,255,255,0.1) 0%,
-                rgba(255,255,255,0.3) 50%,
-                rgba(255,255,255,0.1) 100%
+                rgba(255,255,255,0.08) 0%,
+                rgba(255,255,255,0.18) 50%,
+                rgba(255,255,255,0.08) 100%
             );
             background-size: 200% 100%;
         }
@@ -44,87 +37,86 @@
 
 <body class="bg-black text-white">
 
-    <header class="fixed w-full">
-        <div id="site-header"></div>
-    </header>
+<header class="fixed w-full">
+    <div id="site-header"></div>
+</header>
 
 <script>
-  async function loadHeader() {
+async function loadHeader() {
     const el = document.getElementById('site-header');
     const html = await fetch('header.html').then(r => r.text());
     el.innerHTML = html;
-  }
-  loadHeader();
+}
+loadHeader();
 </script>
 
-    <section class="py-12 pt-[6rem]">
-        <div class="max-w-6xl mx-auto px-6">
+<section class="py-12 pt-[6rem]">
+    <div class="max-w-6xl mx-auto px-6">
 
-            <div class="flex flex-col mb-20">
-                <span class="text-3xl font-bold mx-auto mb-2">My Services</span>
-            </div>
-
-            <div id="servicesContainer"
-                 class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            </div>
-
+        <div class="flex flex-col mb-20">
+            <span class="text-3xl font-bold mx-auto mb-2">My Services</span>
         </div>
-    </section>
 
-    <!-- AOS Script -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>AOS.init({ duration: 200, once: true });</script>
+        <div id="servicesContainer"
+             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        </div>
 
-    <!-- LOAD SERVICES -->
-    <script>
-        function showSkeleton() {
-            const container = document.getElementById("servicesContainer");
-            container.innerHTML = "";
+    </div>
+</section>
 
-            for (let i = 0; i < 6; i++) {
-                container.innerHTML += `
-                    <div class="bg-white/10 rounded-2xl p-6 skeleton h-48"></div>
-                `;
-            }
-        }
+<!-- AOS Script -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>AOS.init({ duration: 200, once: true });</script>
 
-        async function loadServices() {
-            showSkeleton();
+<script>
+function showSkeleton() {
+    const container = document.getElementById("servicesContainer");
+    container.innerHTML = "";
 
-            const { data, error } = await supabase
-                .from("services")
-                .select("*")
-                .order("id", { ascending: true });
+    for (let i = 0; i < 6; i++) {
+        container.innerHTML += `
+            <div class="bg-white/10 rounded-2xl p-6 skeleton h-48"></div>
+        `;
+    }
+}
 
-            const container = document.getElementById("servicesContainer");
-            container.innerHTML = "";
+async function loadServices() {
+    showSkeleton();
 
-            if (error) {
-                container.innerHTML = "<p class='text-red-500'>Failed to load services.</p>";
-                return;
-            }
+    const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .order("id", { ascending: true });
 
-            data.forEach(service => {
-                const shadowClass = service.color ? `hover-shadow-${service.color}` : "";
+    const container = document.getElementById("servicesContainer");
+    container.innerHTML = "";
 
-                container.innerHTML += `
-                    <div data-aos="fade-up"
-                        class="bg-white/10 text-white rounded-2xl p-6 text-center 
-                        hover:scale-105 hover:-translate-y-2 transition-all duration-300 ${shadowClass}">
-                        
-                        <div class="text-${service.color} text-5xl mb-4">
-                            <i class="${service.icon}"></i>
-                        </div>
+    if (error) {
+        container.innerHTML = "<p class='text-red-500'>Failed to load services.</p>";
+        return;
+    }
 
-                        <h3 class="text-xl font-semibold mb-2">${service.title}</h3>
-                        <p class="text-gray-400 text-sm">${service.description}</p>
-                    </div>
-                `;
-            });
-        }
+    data.forEach(service => {
+        container.innerHTML += `
+            <div data-aos="fade-up"
+                class="bg-white/10 text-white rounded-2xl p-6 text-center 
+                transition-all duration-300
+                hover:scale-105 hover:-translate-y-2 
+                hover:shadow-lg hover:shadow-white/40">
 
-        loadServices();
-    </script>
+                <div class="text-${service.color} text-5xl mb-4">
+                    <i class="${service.icon}"></i>
+                </div>
+
+                <h3 class="text-xl font-semibold mb-2">${service.title}</h3>
+                <p class="text-gray-400 text-sm">${service.description}</p>
+            </div>
+        `;
+    });
+}
+
+loadServices();
+</script>
 
 </body>
 </html>
