@@ -4,22 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog</title>
+    <title>Blog Details</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabaseClient.js"></script>
 </head>
 
 <body class="bg-black text-white">
 
-<!-- HEADER -->
 <header class="fixed top-0 left-0 w-full z-50 bg-black shadow-md">
     <div id="site-header"></div>
 </header>
-
 <script>
 async function loadHeader() {
     const el = document.getElementById("site-header");
@@ -29,16 +25,14 @@ async function loadHeader() {
 loadHeader();
 </script>
 
-
 <!-- BLOG CONTENT -->
 <div class="max-w-4xl mx-auto pt-[6rem] px-6 pb-20" id="blogContent">
     <p class="text-gray-400">Loading blog...</p>
 </div>
 
-
 <!-- COMMENTS SECTION -->
 <div class="max-w-4xl mx-auto px-6 pb-20">
-    
+
     <h2 class="text-2xl font-bold mb-4">Comments</h2>
 
     <div id="commentList" class="space-y-4">
@@ -64,41 +58,30 @@ loadHeader();
 
 </div>
 
-
 <script>
 
-/* --------------------------------------------------
-   VALIDATE BLOG ID (IMPORTANT FIX)
--------------------------------------------------- */
+/* VALIDATE BLOG ID */
 const idParam = new URLSearchParams(location.search).get("id");
-const blogId = parseInt(idParam, 10);
+const blogId = parseInt(idParam);
 
 if (!idParam || isNaN(blogId) || blogId < 1) {
-    document.getElementById("blogContent").innerHTML = `
-        <p class="text-red-500 text-lg">Invalid blog ID.</p>
-    `;
-    console.error("Invalid blog ID:", idParam);
-    throw new Error("Invalid blog ID");
+    document.getElementById("blogContent").innerHTML =
+        `<p class="text-red-500 text-lg">Invalid blog ID.</p>`;
+    throw new Error("Invalid ID");
 }
 
-
-/* -------------------------------
-   LOAD BLOG DETAILS
---------------------------------*/
+/* LOAD BLOG */
 async function loadBlog() {
-
-    const blogBox = document.getElementById("blogContent");
-
     const { data: b, error } = await supabase
         .from("blogs")
         .select("*")
         .eq("id", blogId)
         .maybeSingle();
 
+    const blogBox = document.getElementById("blogContent");
+
     if (error || !b) {
-        blogBox.innerHTML = `
-            <p class="text-red-500 text-lg">Blog not found.</p>
-        `;
+        blogBox.innerHTML = `<p class="text-red-500 text-lg">Blog not found.</p>`;
         return;
     }
 
@@ -118,19 +101,13 @@ async function loadBlog() {
             <span id="likeCount" class="text-gray-300 text-lg">${likes}</span>
         </div>
 
-        <p class="mt-6 text-gray-200 leading-7 whitespace-pre-line">
-            ${b.content}
-        </p>
+        <p class="mt-6 text-gray-200 leading-7 whitespace-pre-line">${b.content}</p>
     `;
 }
 
 loadBlog();
 
-
-
-/* -------------------------------
-   LIKE SYSTEM
---------------------------------*/
+/* LIKE SYSTEM */
 async function likeBlog(id) {
     await supabase.from("blog_likes").insert([{ blog_id: id }]);
     document.getElementById("likeCount").innerText = await getLikes(id);
@@ -145,14 +122,9 @@ async function getLikes(id) {
     return data ? data.length : 0;
 }
 
-
-
-/* -------------------------------
-   LOAD COMMENTS
---------------------------------*/
+/* LOAD COMMENTS */
 async function loadComments() {
-
-    const { data: comments, error } = await supabase
+    const { data: comments } = await supabase
         .from("blog_comments")
         .select("*")
         .eq("blog_id", blogId)
@@ -160,11 +132,6 @@ async function loadComments() {
 
     const box = document.getElementById("commentList");
     box.innerHTML = "";
-
-    if (error) {
-        box.innerHTML = `<p class="text-red-500">Failed to load comments.</p>`;
-        return;
-    }
 
     if (!comments || comments.length === 0) {
         box.innerHTML = `<p class="text-gray-400">No comments yet.</p>`;
@@ -184,17 +151,13 @@ async function loadComments() {
 
 loadComments();
 
-
-
-/* -------------------------------
-   SUBMIT COMMENT
---------------------------------*/
+/* SUBMIT COMMENT */
 async function submitComment() {
     let name = document.getElementById("commentName").value.trim();
     let comment = document.getElementById("commentText").value.trim();
 
     if (comment === "") {
-        alert("Please write a comment.");
+        alert("Write a comment first!");
         return;
     }
 
